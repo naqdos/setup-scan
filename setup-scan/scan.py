@@ -8,6 +8,8 @@ DEFAULT_SCAN_LIST = [
     "AAPL", "MSFT", "NVDA", "AMD", "TSLA", "META", "GOOGL", "AMZN",
     "AVGO", "NFLX", "CRM", "ADBE", "COST", "PANW", "SHOP", "PLTR",
     "CRWD", "UBER", "LLY", "V",
+    "MU", "ORCL", "SMCI", "VRT", "ANET", "MRVL", "TSM", "NOW", "INTC", "QCOM",
+    "NBIS", "SNDK", "WDC", "HOOD", "SOFI",
 ]
 
 

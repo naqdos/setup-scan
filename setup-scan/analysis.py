@@ -20,6 +20,8 @@ def fetch_ticker(ticker, period="2y"):
 
 def relative_strength(ticker_df, spy_df, lookback=63):
     """Simple RS: ticker's % return vs SPY's % return over `lookback` days."""
+    if len(ticker_df) <= lookback or len(spy_df) <= lookback:
+        return None
     t_ret = ticker_df["close"].iloc[-1] / ticker_df["close"].iloc[-lookback] - 1
     s_ret = spy_df["close"].iloc[-1] / spy_df["close"].iloc[-lookback] - 1
     return round((t_ret - s_ret) * 100, 2)
@@ -74,6 +76,29 @@ def analyze(ticker, include_backtest=True):
         ema=float(latest["ema"]) if pd.notna(latest["ema"]) else None,
     )
 
+    # Short-term (~2 weeks) and long-term (~1 year) views, alongside the
+    # overall score above (which is ~3-month RS + 52-week high + 20-EMA trend)
+    df_short = add_indicators(df, ema_period=10)
+    df_long = add_indicators(df, ema_period=50)
+
+    rs_short = relative_strength(df, spy, lookback=10) if spy is not None else None
+    rs_long = relative_strength(df, spy, lookback=252) if spy is not None else None
+
+    high_20d = df["high"].rolling(20).max().shift(1).iloc[-1]
+    dist_20d_high = round((latest["close"] / high_20d - 1) * 100, 2) if pd.notna(high_20d) else None
+
+    ema10 = float(df_short["ema"].iloc[-1]) if pd.notna(df_short["ema"].iloc[-1]) else None
+    ema50 = float(df_long["ema"].iloc[-1]) if pd.notna(df_long["ema"].iloc[-1]) else None
+
+    short_score, short_components = momentum_score(
+        rs_pct=rs_short, rvol=rvol, dist_from_high_pct=dist_20d_high,
+        close=float(latest["close"]), ema=ema10,
+    )
+    long_score, long_components = momentum_score(
+        rs_pct=rs_long, rvol=rvol, dist_from_high_pct=dist_from_hod,
+        close=float(latest["close"]), ema=ema50,
+    )
+
     return {
         "ticker": ticker.upper(),
         "close": round(float(latest["close"]), 2),
@@ -88,6 +113,10 @@ def analyze(ticker, include_backtest=True):
         "setup_stats": setup_stats,
         "momentum_score": score_total,
         "momentum_components": score_components,
+        "short_term_score": short_score,
+        "short_term_components": short_components,
+        "long_term_score": long_score,
+        "long_term_components": long_components,
     }
 
 
