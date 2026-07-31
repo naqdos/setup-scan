@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>setup scan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0e;
+    --panel: #14171a;
+    --line: #262b2f;
+    --amber: #f5a623;
+    --green: #3ddc84;
+    --red: #ff5c5c;
+    --text: #d8dadc;
+    --muted: #7a8288;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+  .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .brand span { color: var(--amber); }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 28px;
+    margin: 0 0 32px;
+    color: var(--text);
+  }
+  form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  input[type="text"] {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--amber);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 14px 16px;
+    text-transform: uppercase;
+    outline: none;
+  }
+  input[type="text"]:focus { border-color: var(--amber); }
+  input[type="text"]::placeholder { color: var(--muted); font-weight: 400; }
+  button {
+    background: var(--amber);
+    border: none;
+    color: #14100a;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0 22px;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.88; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .hint {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 0 0 40px;
+  }
+  .status {
+    color: var(--muted);
+    font-size: 13px;
+    padding: 20px 0;
+  }
+  .error {
+    color: var(--red);
+    font-size: 13px;
+    padding: 16px 0;
+  }
+  .result { display: none; }
+  .result.show { display: block; }
+  .ticker-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .ticker-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+  }
+  .ticker-date { color: var(--muted); font-size: 12px; }
+  .ticker-price { font-size: 20px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .stat {
+    background: var(--panel);
+    padding: 14px 16px;
+  }
+  .stat-label {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .stat-value { font-size: 18px; font-weight: 700; }
+  .stat-value.pos { color: var(--green); }
+  .stat-value.neg { color: var(--red); }
+  .signals-label {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .signals { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .pill.active {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(61, 220, 132, 0.08);
+  }
+  .pill.active::before { content: "● "; }
+
+  .setup-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: 24px;
+  }
+  .setup-card {
+    background: var(--panel);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .setup-card.active { box-shadow: inset 3px 0 0 var(--green); }
+  .setup-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    min-width: 140px;
+  }
+  .setup-metrics {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .setup-metrics b { color: var(--text); }
+  .setup-metrics .win-hi b { color: var(--green); }
+  .setup-metrics .win-lo b { color: var(--red); }
+  .no-trades { color: var(--muted); font-size: 12px; font-style: italic; }
+
+  .fund-section { margin-top: 32px; }
+  .fund-section-title {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .fund-groups {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-bottom: 16px;
+  }
+  .fund-group { background: var(--panel); padding: 14px 16px; }
+  .fund-group-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+  .fund-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 3px 0;
+    color: var(--muted);
+  }
+  .fund-row b { color: var(--text); font-weight: 500; }
+  .fund-unavailable { color: var(--muted); font-size: 12px; font-style: italic; padding: 12px 0; }
+
+  .score-block {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    border: 1px solid var(--line);
+    padding: 20px;
+    margin-bottom: 24px;
+    background: var(--panel);
+  }
+  .score-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--amber);
+    min-width: 100px;
+  }
+  .score-number small {
+    font-size: 18px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .score-components {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+  }
+  .score-row-label {
+    width: 100px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .score-bar-track {
+    flex: 1;
+    height: 5px;
+    background: var(--line);
+    position: relative;
+  }
+  .score-bar-fill {
+    height: 100%;
+    background: var(--amber);
+  }
+  .score-row-value { width: 30px; text-align: right; color: var(--text); }
+
+  .timeframe-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .timeframe-cell {
+    background: var(--panel);
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .timeframe-label {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .timeframe-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--amber);
+  }
+  .timeframe-value small { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">nathan trades <span>//</span> setup scan <span>//</span> <a href="/scan" style="color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted);">daily scan</a> <span>//</span> <a href="/movers" style="color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted);">movers</a> <span>//</span> <a href="/earnings" style="color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted);">earnings</a></div>
+  <h1>Type a ticker. See if it's set up.</h1>
+
+  <form id="form">
+    <input type="text" id="ticker" placeholder="e.g. NVDA" autocomplete="off" autofocus>
+    <button type="submit" id="go">Scan</button>
+  </form>
+  <div class="hint">Checks MA bounce, breakout, and undercut-rally against the latest daily bar.</div>
+
+  <div class="status" id="status"></div>
+  <div class="error" id="error"></div>
+
+  <div class="result" id="result">
+    <div class="ticker-row">
+      <div>
+        <div class="ticker-name" id="r-ticker"></div>
+        <div class="ticker-date" id="r-date"></div>
+      </div>
+      <div class="ticker-price" id="r-price"></div>
+    </div>
+
+    <div class="score-block">
+      <div class="score-number"><span id="r-score">--</span><small>/100</small></div>
+      <div class="score-components" id="r-score-components"></div>
+    </div>
+
+    <div class="timeframe-row">
+      <div class="timeframe-cell">
+        <div class="timeframe-label">Short-term (~2wk)</div>
+        <div class="timeframe-value"><span id="r-short-score">--</span><small>/100</small></div>
+      </div>
+      <div class="timeframe-cell">
+        <div class="timeframe-label">Overall (~3mo)</div>
+        <div class="timeframe-value"><span id="r-mid-score">--</span><small>/100</small></div>
+      </div>
+      <div class="timeframe-cell">
+        <div class="timeframe-label">Long-term (~1yr)</div>
+        <div class="timeframe-value"><span id="r-long-score">--</span><small>/100</small></div>
+      </div>
+      <div class="timeframe-cell">
+        <div class="timeframe-label">Fundamental</div>
+        <div class="timeframe-value"><span id="r-fund-score">--</span><small>/100</small></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="stat">
+        <div class="stat-label">RS vs SPY (63d)</div>
+        <div class="stat-value" id="r-rs"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">RVOL</div>
+        <div class="stat-value" id="r-rvol"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">ADR%</div>
+        <div class="stat-value" id="r-adr"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">ATR</div>
+        <div class="stat-value" id="r-atr"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Dist. from 52w high</div>
+        <div class="stat-value" id="r-hod"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Dist. from 52w low</div>
+        <div class="stat-value" id="r-lod"></div>
+      </div>
+    </div>
+
+    <div class="signals-label">Setups — firing today &amp; historical performance on this ticker</div>
+    <div class="setup-cards" id="r-setup-cards"></div>
+
+    <div class="fund-section">
+      <div class="fund-section-title">Fundamentals</div>
+      <div id="r-fund-unavailable" class="fund-unavailable" style="display:none;">Fundamental data not available for this ticker.</div>
+      <div class="fund-groups" id="r-fund-groups" style="display:none;">
+        <div class="fund-group">
+          <div class="fund-group-label">Valuation</div>
+          <div class="fund-row"><span>Trailing P/E</span><b id="f-trailing-pe">—</b></div>
+          <div class="fund-row"><span>Forward P/E</span><b id="f-forward-pe">—</b></div>
+          <div class="fund-row"><span>PEG ratio</span><b id="f-peg">—</b></div>
+          <div class="fund-row"><span>Price/Sales</span><b id="f-ps">—</b></div>
+          <div class="fund-row"><span>Price/Book</span><b id="f-pb">—</b></div>
+        </div>
+        <div class="fund-group">
+          <div class="fund-group-label">Growth (YoY)</div>
+          <div class="fund-row"><span>Revenue growth</span><b id="f-rev-growth">—</b></div>
+          <div class="fund-row"><span>Earnings growth</span><b id="f-earn-growth">—</b></div>
+        </div>
+        <div class="fund-group">
+          <div class="fund-group-label">Profitability</div>
+          <div class="fund-row"><span>Profit margin</span><b id="f-profit-margin">—</b></div>
+          <div class="fund-row"><span>Operating margin</span><b id="f-op-margin">—</b></div>
+        </div>
+        <div class="fund-group">
+          <div class="fund-group-label">Size &amp; Analyst view</div>
+          <div class="fund-row"><span>Market cap</span><b id="f-market-cap">—</b></div>
+          <div class="fund-row"><span>Avg price target</span><b id="f-target">—</b></div>
+          <div class="fund-row"><span>Consensus</span><b id="f-recommendation">—</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const form = document.getElementById('form');
+const tickerInput = document.getElementById('ticker');
+const goBtn = document.getElementById('go');
+const statusEl = document.getElementById('status');
+const errorEl = document.getElementById('error');
+const resultEl = document.getElementById('result');
+
+const SIGNAL_LABELS = {
+  ma_bounce: 'MA bounce',
+  breakout: 'Breakout',
+  undercut_rally: 'Undercut-rally'
+};
+
+const SCORE_LABELS = {
+  rs: 'RS',
+  rvol: 'RVOL',
+  dist_from_high: 'Near high',
+  trend: 'Trend'
+};
+
+function fmtPct(v) {
+  if (v === null || v === undefined) return '—';
+  const sign = v > 0 ? '+' : '';
+  return `${sign}${v}%`;
+}
+
+function pctClass(v) {
+  if (v === null || v === undefined) return '';
+  return v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const ticker = tickerInput.value.trim().toUpperCase();
+  if (!ticker) return;
+
+  errorEl.textContent = '';
+  resultEl.classList.remove('show');
+  statusEl.textContent = `Fetching ${ticker}...`;
+  goBtn.disabled = true;
+
+  try {
+    const res = await fetch(`/api/analyze?ticker=${encodeURIComponent(ticker)}`);
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Request failed');
+    }
+
+    document.getElementById('r-ticker').textContent = data.ticker;
+    document.getElementById('r-date').textContent = data.date;
+    document.getElementById('r-price').textContent = `$${data.close}`;
+
+    document.getElementById('r-score').textContent = data.momentum_score;
+    document.getElementById('r-short-score').textContent = data.short_term_score ?? '--';
+    document.getElementById('r-mid-score').textContent = data.momentum_score ?? '--';
+    document.getElementById('r-long-score').textContent = data.long_term_score ?? '--';
+    document.getElementById('r-fund-score').textContent = data.fundamental_score ?? '--';
+
+    const fundGroups = document.getElementById('r-fund-groups');
+    const fundUnavailable = document.getElementById('r-fund-unavailable');
+    if (data.fundamentals) {
+      const f = data.fundamentals;
+      const pct = (v) => (v === null || v === undefined) ? '—' : `${(v * 100).toFixed(1)}%`;
+      const num = (v, d = 2) => (v === null || v === undefined) ? '—' : v.toFixed(d);
+      document.getElementById('f-trailing-pe').textContent = num(f.trailing_pe);
+      document.getElementById('f-forward-pe').textContent = num(f.forward_pe);
+      document.getElementById('f-peg').textContent = num(f.peg_ratio);
+      document.getElementById('f-ps').textContent = num(f.price_to_sales);
+      document.getElementById('f-pb').textContent = num(f.price_to_book);
+      document.getElementById('f-rev-growth').textContent = pct(f.revenue_growth);
+      document.getElementById('f-earn-growth').textContent = pct(f.earnings_growth);
+      document.getElementById('f-profit-margin').textContent = pct(f.profit_margin);
+      document.getElementById('f-op-margin').textContent = pct(f.operating_margin);
+      document.getElementById('f-market-cap').textContent = f.market_cap_formatted ?? '—';
+      document.getElementById('f-target').textContent = f.target_mean_price ? `$${f.target_mean_price.toFixed(2)}` : '—';
+      document.getElementById('f-recommendation').textContent = f.recommendation_key ? f.recommendation_key.replace('_', ' ') : '—';
+      fundGroups.style.display = 'grid';
+      fundUnavailable.style.display = 'none';
+    } else {
+      fundGroups.style.display = 'none';
+      fundUnavailable.style.display = 'block';
+    }
+    const scoreCompEl = document.getElementById('r-score-components');
+    scoreCompEl.innerHTML = '';
+    for (const [key, label] of Object.entries(SCORE_LABELS)) {
+      const val = (data.momentum_components && data.momentum_components[key]) ?? 0;
+      const row = document.createElement('div');
+      row.className = 'score-row';
+      row.innerHTML = `
+        <div class="score-row-label">${label}</div>
+        <div class="score-bar-track"><div class="score-bar-fill" style="width:${val}%"></div></div>
+        <div class="score-row-value">${val}</div>
+      `;
+      scoreCompEl.appendChild(row);
+    }
+
+    document.getElementById('r-rs').textContent = fmtPct(data.rs_vs_spy);
+    document.getElementById('r-rs').className = 'stat-value ' + pctClass(data.rs_vs_spy);
+
+    document.getElementById('r-rvol').textContent = data.rvol ?? '—';
+    document.getElementById('r-adr').textContent = data.adr_pct != null ? `${data.adr_pct}%` : '—';
+    document.getElementById('r-atr').textContent = data.atr ?? '—';
+
+    document.getElementById('r-hod').textContent = fmtPct(data.dist_from_52w_high_pct);
+    document.getElementById('r-hod').className = 'stat-value ' + pctClass(data.dist_from_52w_high_pct);
+
+    document.getElementById('r-lod').textContent = fmtPct(data.dist_from_52w_low_pct);
+    document.getElementById('r-lod').className = 'stat-value ' + pctClass(data.dist_from_52w_low_pct);
+
+    const cardsEl = document.getElementById('r-setup-cards');
+    cardsEl.innerHTML = '';
+    for (const [key, label] of Object.entries(SIGNAL_LABELS)) {
+      const isActive = data.signals[key];
+      const stats = (data.setup_stats && data.setup_stats[key]) || {};
+
+      const card = document.createElement('div');
+      card.className = 'setup-card' + (isActive ? ' active' : '');
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'setup-name';
+      nameEl.textContent = (isActive ? '● ' : '') + label;
+      card.appendChild(nameEl);
+
+      if (!stats.trades) {
+        const none = document.createElement('div');
+        none.className = 'no-trades';
+        none.textContent = 'No historical signals on this ticker';
+        card.appendChild(none);
+      } else {
+        const metrics = document.createElement('div');
+        metrics.className = 'setup-metrics';
+        const winClass = stats.win_rate >= 50 ? 'win-hi' : 'win-lo';
+        metrics.innerHTML = `
+          <span>trades <b>${stats.trades}</b></span>
+          <span class="${winClass}">win rate <b>${stats.win_rate}%</b></span>
+          <span>avg R <b>${stats.avg_r}</b></span>
+          <span>max DD <b>${stats.max_drawdown}</b></span>
+        `;
+        card.appendChild(metrics);
+      }
+
+      cardsEl.appendChild(card);
+    }
+
+    statusEl.textContent = '';
+    resultEl.classList.add('show');
+  } catch (err) {
+    errorEl.textContent = `Error: ${err.message}`;
+    statusEl.textContent = '';
+  } finally {
+    goBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

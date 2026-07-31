@@ -6,7 +6,8 @@ import yfinance as yf
 import pandas as pd
 from setups import add_indicators, ma_bounce_signal, breakout_signal, undercut_rally_signal, SETUPS
 from backtest import simulate_trades, compute_stats
-from scoring import momentum_score
+from scoring import momentum_score, fundamental_score
+from fundamentals import fetch_fundamentals, format_market_cap
 
 
 def fetch_ticker(ticker, period="2y"):
@@ -94,10 +95,38 @@ def analyze(ticker, include_backtest=True):
         rs_pct=rs_short, rvol=rvol, dist_from_high_pct=dist_20d_high,
         close=float(latest["close"]), ema=ema10,
     )
-    long_score, long_components = momentum_score(
+    long_technical_score, long_components = momentum_score(
         rs_pct=rs_long, rvol=rvol, dist_from_high_pct=dist_from_hod,
         close=float(latest["close"]), ema=ema50,
     )
+
+    # Fundamentals — separate rating, and blended heavily into long-term
+    # (70% fundamentals / 30% long-term technical), since a year-long price
+    # trend alone doesn't capture valuation, growth, or profitability.
+    fund_data = None
+    fund_total = None
+    fund_components = None
+    try:
+        fund_data = fetch_fundamentals(ticker)
+    except Exception:
+        fund_data = None
+
+    if fund_data:
+        fund_total, fund_components = fundamental_score(
+            peg_ratio=fund_data["peg_ratio"],
+            revenue_growth=fund_data["revenue_growth"],
+            earnings_growth=fund_data["earnings_growth"],
+            profit_margin=fund_data["profit_margin"],
+            operating_margin=fund_data["operating_margin"],
+            recommendation_key=fund_data["recommendation_key"],
+            target_mean_price=fund_data["target_mean_price"],
+            current_price=float(latest["close"]),
+        )
+
+    if fund_total is not None:
+        long_score = round(0.7 * fund_total + 0.3 * long_technical_score, 1)
+    else:
+        long_score = long_technical_score
 
     return {
         "ticker": ticker.upper(),
@@ -116,7 +145,14 @@ def analyze(ticker, include_backtest=True):
         "short_term_score": short_score,
         "short_term_components": short_components,
         "long_term_score": long_score,
+        "long_term_technical_score": long_technical_score,
         "long_term_components": long_components,
+        "fundamental_score": fund_total,
+        "fundamental_components": fund_components,
+        "fundamentals": {
+            **(fund_data or {}),
+            "market_cap_formatted": format_market_cap(fund_data["market_cap"]) if fund_data else None,
+        } if fund_data else None,
     }
 
 
