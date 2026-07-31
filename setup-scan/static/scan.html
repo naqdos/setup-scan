@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>daily scan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0e;
+    --panel: #14171a;
+    --line: #262b2f;
+    --amber: #f5a623;
+    --green: #3ddc84;
+    --red: #ff5c5c;
+    --text: #d8dadc;
+    --muted: #7a8288;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 48px 20px 80px; }
+  .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .brand span { color: var(--amber); }
+  .brand a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 28px;
+    margin: 0 0 8px;
+  }
+  .subhead { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+  .status { color: var(--muted); font-size: 13px; padding: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody td {
+    padding: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody tr:hover { background: var(--panel); }
+  .ticker-cell {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .score-cell { font-weight: 700; color: var(--amber); }
+  .pos { color: var(--green); }
+  .neg { color: var(--red); }
+  .sig-dot { color: var(--green); }
+  .sig-off { color: var(--line); }
+  .error-row td { color: var(--red); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">nathan trades <span>//</span> <a href="/">back to single scan</a></div>
+  <h1>Today's scan</h1>
+  <div class="subhead">Default watchlist, ranked by momentum score. Green dots = setup firing today.</div>
+
+  <div class="status" id="status">Loading...</div>
+  <table id="table" style="display:none">
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Score</th>
+        <th>Price</th>
+        <th>RS</th>
+        <th>RVOL</th>
+        <th>Dist. from high</th>
+        <th>MA bounce</th>
+        <th>Breakout</th>
+        <th>Undercut-rally</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+async function loadScan() {
+  const statusEl = document.getElementById('status');
+  const table = document.getElementById('table');
+  const tbody = document.getElementById('tbody');
+
+  try {
+    const res = await fetch('/api/scan');
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'Request failed');
+
+    tbody.innerHTML = '';
+    for (const r of data.results) {
+      const tr = document.createElement('tr');
+      if (r.error) {
+        tr.className = 'error-row';
+        tr.innerHTML = `<td>${r.ticker}</td><td colspan="8">${r.error}</td>`;
+        tbody.appendChild(tr);
+        continue;
+      }
+      const rsClass = r.rs_vs_spy > 0 ? 'pos' : r.rs_vs_spy < 0 ? 'neg' : '';
+      const distClass = r.dist_from_52w_high_pct > -3 ? 'pos' : '';
+      tr.innerHTML = `
+        <td class="ticker-cell">${r.ticker}</td>
+        <td class="score-cell">${r.momentum_score}</td>
+        <td>$${r.close}</td>
+        <td class="${rsClass}">${r.rs_vs_spy > 0 ? '+' : ''}${r.rs_vs_spy}%</td>
+        <td>${r.rvol ?? '—'}</td>
+        <td class="${distClass}">${r.dist_from_52w_high_pct}%</td>
+        <td class="${r.signals.ma_bounce ? 'sig-dot' : 'sig-off'}">●</td>
+        <td class="${r.signals.breakout ? 'sig-dot' : 'sig-off'}">●</td>
+        <td class="${r.signals.undercut_rally ? 'sig-dot' : 'sig-off'}">●</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    statusEl.style.display = 'none';
+    table.style.display = 'table';
+  } catch (err) {
+    statusEl.textContent = `Error: ${err.message}`;
+  }
+}
+loadScan();
+</script>
+</body>
+</html>
