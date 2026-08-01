@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>earnings calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0e; --panel: #14171a; --line: #262b2f;
+    --amber: #f5a623; --green: #3ddc84; --red: #ff5c5c;
+    --text: #d8dadc; --muted: #7a8288;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 40px 20px 80px; }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .brand a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); margin-right: 10px; }
+  .header-row { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 26px; margin: 0 0 4px; }
+  .as-of { color: var(--amber); font-size: 13px; font-weight: 700; }
+  .subhead { color: var(--muted); font-size: 12px; margin-bottom: 24px; }
+  .status { color: var(--muted); font-size: 13px; padding: 20px 0; }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 900px) {
+    .week-grid { grid-template-columns: 1fr; }
+  }
+  .day-col { border: 1px solid var(--line); background: var(--panel); display: flex; flex-direction: column; }
+  .day-head {
+    text-align: center;
+    padding: 10px 8px;
+    background: rgba(245, 166, 35, 0.08);
+    border-bottom: 1px solid var(--line);
+  }
+  .day-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+  .day-date { color: var(--muted); font-size: 10px; margin-top: 2px; }
+
+  .session-block { border-bottom: 1px solid var(--line); }
+  .session-block:last-child { border-bottom: none; }
+  .session-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    padding: 8px 10px 4px;
+  }
+  .session-label.before { color: var(--green); }
+  .session-label.after { color: var(--red); }
+
+  .ticker-item {
+    padding: 5px 10px;
+    font-size: 12px;
+    border-top: 1px solid rgba(255,255,255,0.03);
+  }
+  .ticker-item .t {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .ticker-item .n {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ticker-row { display: flex; align-items: center; gap: 8px; }
+  .ticker-logo {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    object-fit: contain;
+    background: #fff;
+    flex-shrink: 0;
+  }
+  .ticker-logo.hidden { display: none; }
+  .empty-session { padding: 4px 10px 10px; color: var(--line); font-size: 11px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><a href="/">single scan</a><a href="/scan">daily scan</a><a href="/movers">movers</a></div>
+  <div class="header-row">
+    <h1>Earnings calendar</h1>
+    <div class="as-of" id="as-of"></div>
+  </div>
+  <div class="subhead">$500M+ market cap, top 15 per session by size. Whole market, not filtered to your watchlist.</div>
+
+  <div class="status" id="status">Loading...</div>
+  <div class="week-grid" id="grid" style="display:none"></div>
+</div>
+
+<script>
+const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+// Sign up free at https://www.logo.dev/signup, grab your publishable key,
+// and paste it here. Free tier covers 500K logo requests/month.
+const LOGO_DEV_TOKEN = 'pk_dDna7xCKTKyE9oaF1mkbRQ';
+
+function renderSession(items, label, cls) {
+  const block = document.createElement('div');
+  block.className = 'session-block';
+  const labelEl = document.createElement('div');
+  labelEl.className = `session-label ${cls}`;
+  labelEl.textContent = label;
+  block.appendChild(labelEl);
+
+  if (!items || items.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-session';
+    empty.textContent = '—';
+    block.appendChild(empty);
+    return block;
+  }
+
+  for (const item of items) {
+    const el = document.createElement('div');
+    el.className = 'ticker-item';
+    const logoUrl = `https://img.logo.dev/ticker/${item.ticker}?token=${LOGO_DEV_TOKEN}&size=40`;
+    el.innerHTML = `
+      <div class="ticker-row">
+        <img class="ticker-logo" src="${logoUrl}" alt="" onerror="this.classList.add('hidden')">
+        <span class="t">${item.ticker}</span>
+      </div>
+      ${item.market_cap_formatted ? `<span class="n">${item.market_cap_formatted}${item.name ? ' · ' + item.name : ''}</span>` : (item.name ? `<span class="n">${item.name}</span>` : '')}
+    `;
+    block.appendChild(el);
+  }
+  return block;
+}
+
+async function load() {
+  const statusEl = document.getElementById('status');
+  const grid = document.getElementById('grid');
+  try {
+    const res = await fetch('/api/earnings');
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'Request failed');
+
+    document.getElementById('as-of').textContent = data.dates[0];
+
+    grid.innerHTML = '';
+    data.dates.forEach((dateStr, i) => {
+      const col = document.createElement('div');
+      col.className = 'day-col';
+
+      const head = document.createElement('div');
+      head.className = 'day-head';
+      head.innerHTML = `<div class="day-name">${DAY_NAMES[i]}</div><div class="day-date">${dateStr}</div>`;
+      col.appendChild(head);
+
+      const buckets = data.days[dateStr] || { before_open: [], after_close: [], other: [] };
+      col.appendChild(renderSession(buckets.before_open, 'Before Open', 'before'));
+      col.appendChild(renderSession(buckets.after_close, 'After Close', 'after'));
+      if (buckets.other && buckets.other.length) {
+        col.appendChild(renderSession(buckets.other, 'Time TBD', ''));
+      }
+
+      grid.appendChild(col);
+    });
+
+    statusEl.style.display = 'none';
+    grid.style.display = 'grid';
+  } catch (err) {
+    statusEl.textContent = `Error: ${err.message}`;
+  }
+}
+load();
+</script>
+</body>
+</html>
