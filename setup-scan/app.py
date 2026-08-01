@@ -10,7 +10,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from analysis import analyze
 from scan import run_scan
 from movers import get_movers
-from earnings import get_upcoming_earnings
+from earnings import get_week_earnings
 
 app = Flask(__name__, static_folder="static")
 
@@ -69,10 +69,9 @@ def api_movers():
 
 @app.route("/api/earnings")
 def api_earnings():
-    days = request.args.get("days", 7, type=int)
     try:
-        results = get_upcoming_earnings(days=days)
-        return jsonify({"results": results})
+        result = get_week_earnings()
+        return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

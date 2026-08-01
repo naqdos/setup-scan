@@ -191,6 +191,40 @@
   .setup-metrics .win-lo b { color: var(--red); }
   .no-trades { color: var(--muted); font-size: 12px; font-style: italic; }
 
+  .fund-section { margin-top: 32px; }
+  .fund-section-title {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .fund-groups {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-bottom: 16px;
+  }
+  .fund-group { background: var(--panel); padding: 14px 16px; }
+  .fund-group-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+  .fund-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 3px 0;
+    color: var(--muted);
+  }
+  .fund-row b { color: var(--text); font-weight: 500; }
+  .fund-unavailable { color: var(--muted); font-size: 12px; font-style: italic; padding: 12px 0; }
+
   .score-block {
     display: flex;
     align-items: center;
@@ -245,7 +279,7 @@
 
   .timeframe-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1px;
     background: var(--line);
     border: 1px solid var(--line);
@@ -313,6 +347,10 @@
         <div class="timeframe-label">Long-term (~1yr)</div>
         <div class="timeframe-value"><span id="r-long-score">--</span><small>/100</small></div>
       </div>
+      <div class="timeframe-cell">
+        <div class="timeframe-label">Fundamental</div>
+        <div class="timeframe-value"><span id="r-fund-score">--</span><small>/100</small></div>
+      </div>
     </div>
 
     <div class="grid">
@@ -344,6 +382,37 @@
 
     <div class="signals-label">Setups — firing today &amp; historical performance on this ticker</div>
     <div class="setup-cards" id="r-setup-cards"></div>
+
+    <div class="fund-section">
+      <div class="fund-section-title">Fundamentals</div>
+      <div id="r-fund-unavailable" class="fund-unavailable" style="display:none;">Fundamental data not available for this ticker.</div>
+      <div class="fund-groups" id="r-fund-groups" style="display:none;">
+        <div class="fund-group">
+          <div class="fund-group-label">Valuation</div>
+          <div class="fund-row"><span>Trailing P/E</span><b id="f-trailing-pe">—</b></div>
+          <div class="fund-row"><span>Forward P/E</span><b id="f-forward-pe">—</b></div>
+          <div class="fund-row"><span>PEG ratio</span><b id="f-peg">—</b></div>
+          <div class="fund-row"><span>Price/Sales</span><b id="f-ps">—</b></div>
+          <div class="fund-row"><span>Price/Book</span><b id="f-pb">—</b></div>
+        </div>
+        <div class="fund-group">
+          <div class="fund-group-label">Growth (YoY)</div>
+          <div class="fund-row"><span>Revenue growth</span><b id="f-rev-growth">—</b></div>
+          <div class="fund-row"><span>Earnings growth</span><b id="f-earn-growth">—</b></div>
+        </div>
+        <div class="fund-group">
+          <div class="fund-group-label">Profitability</div>
+          <div class="fund-row"><span>Profit margin</span><b id="f-profit-margin">—</b></div>
+          <div class="fund-row"><span>Operating margin</span><b id="f-op-margin">—</b></div>
+        </div>
+        <div class="fund-group">
+          <div class="fund-group-label">Size &amp; Analyst view</div>
+          <div class="fund-row"><span>Market cap</span><b id="f-market-cap">—</b></div>
+          <div class="fund-row"><span>Avg price target</span><b id="f-target">—</b></div>
+          <div class="fund-row"><span>Consensus</span><b id="f-recommendation">—</b></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -405,6 +474,32 @@ form.addEventListener('submit', async (e) => {
     document.getElementById('r-short-score').textContent = data.short_term_score ?? '--';
     document.getElementById('r-mid-score').textContent = data.momentum_score ?? '--';
     document.getElementById('r-long-score').textContent = data.long_term_score ?? '--';
+    document.getElementById('r-fund-score').textContent = data.fundamental_score ?? '--';
+
+    const fundGroups = document.getElementById('r-fund-groups');
+    const fundUnavailable = document.getElementById('r-fund-unavailable');
+    if (data.fundamentals) {
+      const f = data.fundamentals;
+      const pct = (v) => (v === null || v === undefined) ? '—' : `${(v * 100).toFixed(1)}%`;
+      const num = (v, d = 2) => (v === null || v === undefined) ? '—' : v.toFixed(d);
+      document.getElementById('f-trailing-pe').textContent = num(f.trailing_pe);
+      document.getElementById('f-forward-pe').textContent = num(f.forward_pe);
+      document.getElementById('f-peg').textContent = num(f.peg_ratio);
+      document.getElementById('f-ps').textContent = num(f.price_to_sales);
+      document.getElementById('f-pb').textContent = num(f.price_to_book);
+      document.getElementById('f-rev-growth').textContent = pct(f.revenue_growth);
+      document.getElementById('f-earn-growth').textContent = pct(f.earnings_growth);
+      document.getElementById('f-profit-margin').textContent = pct(f.profit_margin);
+      document.getElementById('f-op-margin').textContent = pct(f.operating_margin);
+      document.getElementById('f-market-cap').textContent = f.market_cap_formatted ?? '—';
+      document.getElementById('f-target').textContent = f.target_mean_price ? `$${f.target_mean_price.toFixed(2)}` : '—';
+      document.getElementById('f-recommendation').textContent = f.recommendation_key ? f.recommendation_key.replace('_', ' ') : '—';
+      fundGroups.style.display = 'grid';
+      fundUnavailable.style.display = 'none';
+    } else {
+      fundGroups.style.display = 'none';
+      fundUnavailable.style.display = 'block';
+    }
     const scoreCompEl = document.getElementById('r-score-components');
     scoreCompEl.innerHTML = '';
     for (const [key, label] of Object.entries(SCORE_LABELS)) {
