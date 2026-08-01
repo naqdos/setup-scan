@@ -87,7 +87,7 @@
     <h1>Earnings calendar</h1>
     <div class="as-of" id="as-of"></div>
   </div>
-  <div class="subhead">Whole market, grouped by day and session. Not filtered to your watchlist.</div>
+  <div class="subhead">$500M+ market cap, top 15 per session by size. Whole market, not filtered to your watchlist.</div>
 
   <div class="status" id="status">Loading...</div>
   <div class="week-grid" id="grid" style="display:none"></div>
@@ -115,7 +115,7 @@ function renderSession(items, label, cls) {
   for (const item of items) {
     const el = document.createElement('div');
     el.className = 'ticker-item';
-    el.innerHTML = `<span class="t">${item.ticker}</span>${item.name ? `<span class="n">${item.name}</span>` : ''}`;
+    el.innerHTML = `<span class="t">${item.ticker}</span>${item.market_cap_formatted ? `<span class="n">${item.market_cap_formatted}${item.name ? ' · ' + item.name : ''}</span>` : (item.name ? `<span class="n">${item.name}</span>` : '')}`;
     block.appendChild(el);
   }
   return block;

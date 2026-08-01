@@ -103,13 +103,18 @@ def analyze(ticker, include_backtest=True):
     # Fundamentals — separate rating, and blended heavily into long-term
     # (70% fundamentals / 30% long-term technical), since a year-long price
     # trend alone doesn't capture valuation, growth, or profitability.
+    # Only fetched for the single-ticker page (include_backtest=True) — this
+    # is a much heavier call than price history, so scan/movers (which check
+    # many tickers per request) skip it entirely and use the technical
+    # long-term score alone.
     fund_data = None
     fund_total = None
     fund_components = None
-    try:
-        fund_data = fetch_fundamentals(ticker)
-    except Exception:
-        fund_data = None
+    if include_backtest:
+        try:
+            fund_data = fetch_fundamentals(ticker)
+        except Exception:
+            fund_data = None
 
     if fund_data:
         fund_total, fund_components = fundamental_score(

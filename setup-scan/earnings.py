@@ -1,7 +1,9 @@
 """
-Pulls the FULL market's earnings calendar (not filtered to any watchlist)
-for the current business week, grouped by day and by session
-(before-open / after-close). Fetches all 5 weekdays in parallel.
+Pulls the market's earnings calendar for the current business week, grouped
+by day and session (before-open / after-close). Filters to companies with
+market cap >= $500M and caps each session at 15 names, largest cap first,
+since the unfiltered list runs into the hundreds and most are illiquid names
+nobody's tracking.
 """
 import requests
 from datetime import datetime, timedelta
@@ -13,6 +15,9 @@ HEADERS = {
     "Accept": "application/json",
 }
 
+MIN_MARKET_CAP = 500_000_000
+MAX_PER_SESSION = 15
+
 
 def _fetch_day(date_str):
     """Returns the list of ticker rows reporting on this date, or [] on failure."""
@@ -23,6 +28,31 @@ def _fetch_day(date_str):
         return (data.get("data") or {}).get("rows") or []
     except Exception:
         return []
+
+
+def _parse_market_cap(value):
+    """Nasdaq returns this as a string like '$1,234,567,890' or 'NA'."""
+    if not value:
+        return None
+    s = str(value).replace("$", "").replace(",", "").strip()
+    if not s or s.upper() in ("N/A", "NA"):
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def _format_market_cap(value):
+    if value is None:
+        return None
+    if value >= 1e12:
+        return f"${value / 1e12:.2f}T"
+    if value >= 1e9:
+        return f"${value / 1e9:.2f}B"
+    if value >= 1e6:
+        return f"${value / 1e6:.2f}M"
+    return f"${value:,.0f}"
 
 
 def _session_bucket(time_value):
@@ -56,7 +86,8 @@ def get_week_earnings():
         ...
       }
     }
-    Each entry in a bucket is {"ticker": ..., "name": ..., "eps_forecast": ...}.
+    Each bucket holds at most MAX_PER_SESSION entries, filtered to market cap
+    >= MIN_MARKET_CAP, sorted largest-cap first.
     """
     dates = _week_dates()
     date_strs = [d.isoformat() for d in dates]
@@ -71,30 +102,22 @@ def get_week_earnings():
             symbol = (row.get("symbol") or "").upper()
             if not symbol:
                 continue
+            cap = _parse_market_cap(row.get("marketCap"))
+            if cap is None or cap < MIN_MARKET_CAP:
+                continue
             entry = {
                 "ticker": symbol,
                 "name": row.get("name"),
                 "eps_forecast": row.get("epsForecast"),
+                "market_cap": cap,
+                "market_cap_formatted": _format_market_cap(cap),
             }
             buckets[_session_bucket(row.get("time"))].append(entry)
+
+        for key in buckets:
+            buckets[key].sort(key=lambda e: e["market_cap"], reverse=True)
+            buckets[key] = buckets[key][:MAX_PER_SESSION]
+
         days[date_str] = buckets
 
     return {"dates": date_strs, "days": days}
-
-
-# Kept for anything still calling the old per-watchlist signature.
-def get_upcoming_earnings(tickers=None, days=7):
-    from scan import DEFAULT_SCAN_LIST
-    watch = set(t.upper() for t in (tickers or DEFAULT_SCAN_LIST))
-    week = get_week_earnings()
-    results = []
-    today = datetime.now().date()
-    for date_str, buckets in week["days"].items():
-        d = datetime.strptime(date_str, "%Y-%m-%d").date()
-        days_away = (d - today).days
-        for bucket in buckets.values():
-            for entry in bucket:
-                if entry["ticker"] in watch:
-                    results.append({**entry, "earnings_date": date_str, "days_away": days_away})
-    results.sort(key=lambda r: r["days_away"])
-    return results
