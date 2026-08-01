@@ -77,6 +77,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .ticker-row { display: flex; align-items: center; gap: 8px; }
+  .ticker-logo {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    object-fit: contain;
+    background: #fff;
+    flex-shrink: 0;
+  }
+  .ticker-logo.hidden { display: none; }
   .empty-session { padding: 4px 10px 10px; color: var(--line); font-size: 11px; font-style: italic; }
 </style>
 </head>
@@ -95,6 +105,10 @@
 
 <script>
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+// Sign up free at https://www.logo.dev/signup, grab your publishable key,
+// and paste it here. Free tier covers 500K logo requests/month.
+const LOGO_DEV_TOKEN = 'pk_dDna7xCKTKyE9oaF1mkbRQ';
 
 function renderSession(items, label, cls) {
   const block = document.createElement('div');
@@ -115,7 +129,14 @@ function renderSession(items, label, cls) {
   for (const item of items) {
     const el = document.createElement('div');
     el.className = 'ticker-item';
-    el.innerHTML = `<span class="t">${item.ticker}</span>${item.market_cap_formatted ? `<span class="n">${item.market_cap_formatted}${item.name ? ' · ' + item.name : ''}</span>` : (item.name ? `<span class="n">${item.name}</span>` : '')}`;
+    const logoUrl = `https://img.logo.dev/ticker/${item.ticker}?token=${LOGO_DEV_TOKEN}&size=40`;
+    el.innerHTML = `
+      <div class="ticker-row">
+        <img class="ticker-logo" src="${logoUrl}" alt="" onerror="this.classList.add('hidden')">
+        <span class="t">${item.ticker}</span>
+      </div>
+      ${item.market_cap_formatted ? `<span class="n">${item.market_cap_formatted}${item.name ? ' · ' + item.name : ''}</span>` : (item.name ? `<span class="n">${item.name}</span>` : '')}
+    `;
     block.appendChild(el);
   }
   return block;
