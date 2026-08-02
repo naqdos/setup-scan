@@ -1,16 +1,31 @@
 """
 Pulls fundamental data for one ticker via yfinance's `.info` property.
 Separate from analysis.py's price-history fetch since this is a different
-kind of call (company metadata, not OHLCV bars).
+kind of call (company metadata, not OHLCV bars) — heavier and more prone
+to transient failures, so this retries once before giving up.
 """
+import time
 import yfinance as yf
 
 
-def fetch_fundamentals(ticker):
-    info = yf.Ticker(ticker).info
-    if not info:
-        return None
+def fetch_fundamentals(ticker, retries=1, retry_delay=1.5):
+    last_error = None
+    for attempt in range(retries + 1):
+        try:
+            info = yf.Ticker(ticker).info
+            if info:
+                return _parse_info(info)
+            last_error = "empty response"
+        except Exception as e:
+            last_error = e
 
+        if attempt < retries:
+            time.sleep(retry_delay)
+
+    return None
+
+
+def _parse_info(info):
     return {
         "trailing_pe": info.get("trailingPE"),
         "forward_pe": info.get("forwardPE"),
