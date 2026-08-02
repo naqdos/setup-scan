@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup Scan — Nathan Trades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0e; --panel: #14171a; --line: #262b2f;
+    --amber: #f5a623; --green: #3ddc84; --red: #ff5c5c;
+    --text: #d8dadc; --muted: #7a8288;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 60px 20px 80px; }
+
+  .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); margin-bottom: 24px; }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 1.15;
+    margin: 0 0 16px;
+  }
+  .mission {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 620px;
+    margin: 0 0 40px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-bottom: 48px;
+  }
+  .stat {
+    flex: 1;
+    background: var(--panel);
+    padding: 18px 20px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--amber);
+  }
+  .stat-label {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+  }
+
+  .section-label {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+  }
+
+  .nav-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+  @media (max-width: 700px) {
+    .nav-grid { grid-template-columns: 1fr; }
+    .stats-row { flex-wrap: wrap; }
+    .stat { flex: 1 1 45%; }
+  }
+
+  .nav-card {
+    display: block;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 20px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s;
+    position: relative;
+  }
+  .nav-card:hover { border-color: var(--amber); }
+  .nav-card.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  .nav-card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-card-desc {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .soon-tag {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .roadmap {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 20px;
+  }
+  .roadmap-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    padding: 6px 0;
+    color: var(--muted);
+  }
+  .roadmap-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .roadmap-item.done .dot { background: var(--green); }
+  .roadmap-item.done { color: var(--text); }
+  .roadmap-item.planned .dot { background: var(--line); border: 1px solid var(--muted); }
+
+  footer {
+    margin-top: 48px;
+    color: var(--line);
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Nathan Trades // Setup Scan</div>
+  <h1>Data-driven stock analysis, backtesting, and research — in one place.</h1>
+  <p class="mission">
+    A momentum and swing-trading toolkit combining technical screening, a
+    custom scoring model, historical backtesting, and fundamentals — built to
+    organize signals that are usually scattered across a dozen different
+    tabs into one place.
+  </p>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">35</div><div class="stat-label">Tickers Tracked</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">Strategies</div></div>
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Pages Live</div></div>
+  </div>
+
+  <div class="section-label">Explore</div>
+  <div class="nav-grid">
+    <a href="/scanner" class="nav-card">
+      <div class="nav-card-title">Stock Scanner</div>
+      <div class="nav-card-desc">Type a ticker, get a live snapshot: momentum score, fundamentals, and setup signals.</div>
+    </a>
+    <a href="/scan" class="nav-card">
+      <div class="nav-card-title">Daily Scan</div>
+      <div class="nav-card-desc">Your watchlist ranked by momentum score, updated live.</div>
+    </a>
+    <a href="/movers" class="nav-card">
+      <div class="nav-card-title">Market Movers</div>
+      <div class="nav-card-desc">Today's biggest % movers and volume spikes.</div>
+    </a>
+    <a href="/earnings" class="nav-card">
+      <div class="nav-card-title">Earnings Calendar</div>
+      <div class="nav-card-desc">This week's earnings across the whole market, by session.</div>
+    </a>
+    <a href="/methodology" class="nav-card">
+      <div class="nav-card-title">Methodology</div>
+      <div class="nav-card-desc">How the momentum score and setups actually work.</div>
+    </a>
+    <a href="/about" class="nav-card">
+      <div class="nav-card-title">About</div>
+      <div class="nav-card-desc">Why this exists and who built it.</div>
+    </a>
+    <div class="nav-card disabled">
+      <div class="nav-card-title">Strategy Library <span class="soon-tag">Soon</span></div>
+      <div class="nav-card-desc">A breakdown of each setup — when to use it, what to look for.</div>
+    </div>
+    <div class="nav-card disabled">
+      <div class="nav-card-title">Glossary <span class="soon-tag">Soon</span></div>
+      <div class="nav-card-desc">Plain-language definitions — RS, PEG, support/resistance, and more.</div>
+    </div>
+    <div class="nav-card disabled">
+      <div class="nav-card-title">Feedback <span class="soon-tag">Soon</span></div>
+      <div class="nav-card-desc">Report a bug or suggest a feature.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Roadmap</div>
+  <div class="roadmap">
+    <div class="roadmap-item done"><div class="dot"></div>Momentum scoring model (short/mid/long-term)</div>
+    <div class="roadmap-item done"><div class="dot"></div>Backtesting engine (MA bounce, breakout, undercut-rally)</div>
+    <div class="roadmap-item done"><div class="dot"></div>Fundamentals (valuation, growth, profitability, analyst view)</div>
+    <div class="roadmap-item done"><div class="dot"></div>Daily scan, movers, and earnings calendar pages</div>
+    <div class="roadmap-item planned"><div class="dot"></div>Strategy library with example charts</div>
+    <div class="roadmap-item planned"><div class="dot"></div>Glossary / learn page</div>
+    <div class="roadmap-item planned"><div class="dot"></div>Feedback form</div>
+  </div>
+
+  <footer>Built by Nathan · Nathan Trades</footer>
+</div>
+</body>
+</html>

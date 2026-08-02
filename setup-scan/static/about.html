@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>about — nathan trades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0e; --panel: #14171a; --line: #262b2f;
+    --amber: #f5a623; --green: #3ddc84; --red: #ff5c5c;
+    --text: #d8dadc; --muted: #7a8288;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 20px 80px; }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; }
+  .brand a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); margin-right: 10px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 32px; margin: 0 0 24px; }
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--amber);
+    margin: 40px 0 12px;
+  }
+  p { color: var(--text); font-size: 14px; line-height: 1.7; margin: 0 0 14px; }
+  .placeholder {
+    border-left: 2px solid var(--amber);
+    padding: 4px 0 4px 14px;
+    color: var(--muted);
+    font-style: italic;
+    font-size: 13px;
+  }
+  ul { color: var(--text); font-size: 14px; line-height: 1.8; padding-left: 20px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><a href="/">home</a><a href="/scanner">scanner</a><a href="/methodology">methodology</a></div>
+  <h1>About</h1>
+
+  <!-- ============================================================
+       EDIT THIS SECTION — this needs to be in your own words.
+       Prompts to answer, from the conversation you had:
+       - Why did you start investing / trading in the first place?
+       - What gap did you see in the tools already out there?
+       - What does Setup Scan try to do about it?
+       Keep it honest — including the "no indicator is perfect" framing
+       is a strength, not a weakness, since it shows you're thinking
+       critically rather than claiming the score is always right.
+       ============================================================ -->
+  <p class="placeholder">
+    [Rough draft — edit freely, add more when you're ready:]<br><br>
+    I got interested in the markets when I was 14. I started studying
+    every day — reading, watching charts, testing ideas — and slowly
+    building up a set of strategies I actually trusted. It took about two
+    years before I was consistently profitable. Along the way I noticed
+    that the tools I was using were scattered: technicals in one place,
+    fundamentals in another, backtesting somewhere else entirely, and no
+    single place that pulled it all together. I don't think there's a
+    perfect indicator, but I wanted a way to organize both technical and
+    fundamental signals in one place instead of jumping between a dozen
+    tabs. Setup Scan is my attempt at that.
+  </p>
+
+  <h2>What this is</h2>
+  <p>
+    Setup Scan combines technical screening (momentum, relative strength,
+    volume), a custom scoring model, historical backtesting of specific
+    trade setups, and company fundamentals — into a single tool instead of
+    several disconnected ones.
+  </p>
+
+  <h2>Built with</h2>
+  <ul>
+    <li>Python + Flask backend</li>
+    <li>Live market data via yfinance</li>
+    <li>A custom momentum scoring model (see <a href="/methodology" style="color:var(--amber)">Methodology</a>)</li>
+    <li>A backtesting engine for three trade setups</li>
+    <li>Fundamentals (valuation, growth, profitability, analyst view)</li>
+  </ul>
+
+  <h2>A note on accuracy</h2>
+  <p>
+    Backtested results describe how a setup performed historically on
+    specific tickers — they are not a guarantee of future performance.
+    The momentum score is one way of organizing signals, not a claim that
+    it's the "correct" way to value a stock.
+  </p>
+
+  <h2>Research &amp; updates</h2>
+  <!-- Only link this if it's genuinely active — a stale/inactive link
+       undercuts more than it helps. -->
+  <p class="placeholder">
+    [If you're posting regular market commentary somewhere — Discord,
+    Instagram, etc. — link it here. Skip this section entirely if not.]
+  </p>
+</div>
+</body>
+</html>

@@ -16,6 +16,11 @@ app = Flask(__name__, static_folder="static")
 
 
 @app.route("/")
+def home():
+    return send_from_directory("static", "home.html")
+
+
+@app.route("/scanner")
 def index():
     return send_from_directory("static", "index.html")
 
@@ -33,6 +38,16 @@ def movers_page():
 @app.route("/earnings")
 def earnings_page():
     return send_from_directory("static", "earnings.html")
+
+
+@app.route("/about")
+def about_page():
+    return send_from_directory("static", "about.html")
+
+
+@app.route("/methodology")
+def methodology_page():
+    return send_from_directory("static", "methodology.html")
 
 
 @app.route("/api/analyze")

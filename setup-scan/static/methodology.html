@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>methodology — nathan trades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0e; --panel: #14171a; --line: #262b2f;
+    --amber: #f5a623; --green: #3ddc84; --red: #ff5c5c;
+    --text: #d8dadc; --muted: #7a8288;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 20px 80px; }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; }
+  .brand a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); margin-right: 10px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 32px; margin: 0 0 8px; }
+  .subhead { color: var(--muted); font-size: 13px; margin-bottom: 32px; }
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--amber);
+    margin: 40px 0 12px;
+  }
+  h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+    margin: 20px 0 6px;
+  }
+  p { color: var(--text); font-size: 14px; line-height: 1.7; margin: 0 0 14px; }
+  .weight-bar-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+  .weight-label { width: 160px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .weight-track { flex: 1; height: 8px; background: var(--line); position: relative; }
+  .weight-fill { height: 100%; background: var(--amber); }
+  .weight-pct { width: 40px; text-align: right; font-size: 12px; color: var(--text); }
+  .setup-card {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .setup-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--amber); margin-bottom: 6px; }
+  .disclaimer {
+    border: 1px solid var(--red);
+    background: rgba(255, 92, 92, 0.06);
+    padding: 16px 20px;
+    margin-top: 40px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><a href="/">home</a><a href="/scanner">scanner</a><a href="/about">about</a></div>
+  <h1>Methodology</h1>
+  <div class="subhead">How the momentum score, fundamental score, and setup detection actually work.</div>
+
+  <h2>Momentum Score (0-100)</h2>
+  <p>
+    Combines four signals into one number: how a stock is performing versus
+    the market, whether volume backs up the move, how close it is to its
+    own highs, and whether it's trending. Each input is scored 0-100 on its
+    own, then combined with these weights:
+  </p>
+
+  <div class="weight-bar-row">
+    <div class="weight-label">Relative Strength</div>
+    <div class="weight-track"><div class="weight-fill" style="width:30%"></div></div>
+    <div class="weight-pct">30%</div>
+  </div>
+  <div class="weight-bar-row">
+    <div class="weight-label">Distance from High</div>
+    <div class="weight-track"><div class="weight-fill" style="width:30%"></div></div>
+    <div class="weight-pct">30%</div>
+  </div>
+  <div class="weight-bar-row">
+    <div class="weight-label">Relative Volume</div>
+    <div class="weight-track"><div class="weight-fill" style="width:20%"></div></div>
+    <div class="weight-pct">20%</div>
+  </div>
+  <div class="weight-bar-row">
+    <div class="weight-label">Trend</div>
+    <div class="weight-track"><div class="weight-fill" style="width:20%"></div></div>
+    <div class="weight-pct">20%</div>
+  </div>
+
+  <h3>Relative Strength (RS)</h3>
+  <p>How the stock has performed versus the S&amp;P 500 (SPY) over the same period — outperformance scores higher.</p>
+  <h3>Relative Volume (RVOL)</h3>
+  <p>Today's trading volume compared to its own 20-day average — a way of checking whether a price move has real participation behind it.</p>
+  <h3>Distance from High</h3>
+  <p>How close the stock is trading to its own recent high — the closer, the higher the score.</p>
+  <h3>Trend</h3>
+  <p>Whether price is above or below its own moving average — a simple read on whether the stock is currently in an uptrend or downtrend.</p>
+
+  <p>
+    This same structure runs at three timeframes — short-term (~2 weeks),
+    overall (~3 months), and long-term (~1 year) — using a shorter or
+    longer lookback window and moving average for each, so a stock can
+    look strong short-term but weak long-term, or vice versa.
+  </p>
+
+  <h2>Fundamental Score (0-100)</h2>
+  <p>
+    A separate rating built from company financials rather than price
+    action. The long-term score leans heavily on this, since a year of
+    price trend alone doesn't capture whether a company is actually
+    fundamentally healthy.
+  </p>
+
+  <div class="weight-bar-row">
+    <div class="weight-label">Growth</div>
+    <div class="weight-track"><div class="weight-fill" style="width:30%"></div></div>
+    <div class="weight-pct">30%</div>
+  </div>
+  <div class="weight-bar-row">
+    <div class="weight-label">Valuation (PEG)</div>
+    <div class="weight-track"><div class="weight-fill" style="width:25%"></div></div>
+    <div class="weight-pct">25%</div>
+  </div>
+  <div class="weight-bar-row">
+    <div class="weight-label">Profitability</div>
+    <div class="weight-track"><div class="weight-fill" style="width:25%"></div></div>
+    <div class="weight-pct">25%</div>
+  </div>
+  <div class="weight-bar-row">
+    <div class="weight-label">Analyst View</div>
+    <div class="weight-track"><div class="weight-fill" style="width:20%"></div></div>
+    <div class="weight-pct">20%</div>
+  </div>
+
+  <p>
+    Growth averages year-over-year revenue and earnings growth. Valuation
+    uses the PEG ratio (P/E adjusted for growth rate) rather than raw P/E,
+    since a high P/E can still be reasonable for a fast-growing company.
+    Profitability averages profit margin and operating margin. Analyst
+    view blends the consensus rating with how far the current price sits
+    from the average analyst price target.
+  </p>
+
+  <h2>The Three Setups</h2>
+  <div class="setup-card">
+    <div class="setup-name">MA Bounce</div>
+    <p style="margin:0">Stock is in an uptrend, pulls back to touch its moving average, then closes back above it on a green candle — a continuation signal after a healthy pullback.</p>
+  </div>
+  <div class="setup-card">
+    <div class="setup-name">Breakout</div>
+    <p style="margin:0">Stock closes above its recent 20-day high on volume meaningfully above average — a sign of new buying interest pushing through resistance.</p>
+  </div>
+  <div class="setup-card">
+    <div class="setup-name">Undercut &amp; Rally</div>
+    <p style="margin:0">Price dips briefly below a recent low (a shakeout) but rallies back above it by the close — often a sign of a failed breakdown and a shift back to buyers.</p>
+  </div>
+
+  <p>
+    Each setup's historical performance (win rate, average R, trade count,
+    max drawdown) is shown per-ticker on the scanner page, based on how
+    that setup has actually performed on that specific stock over the
+    past ~2 years.
+  </p>
+
+  <div class="disclaimer">
+    <strong>Backtested results describe the past, not the future.</strong>
+    Historical win rate and average return for a setup do not guarantee
+    it will perform the same way going forward. Markets change, and a
+    setup that worked well in one period can behave very differently in
+    another. This tool is meant to organize signals and historical
+    context — not to predict outcomes.
+  </div>
+</div>
+</body>
+</html>
