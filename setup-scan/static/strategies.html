@@ -69,52 +69,53 @@
 
   <div class="strategy-card">
     <div class="strategy-name">MA Bounce</div>
-    <div class="strategy-tagline">Continuation off a moving average pullback</div>
+    <div class="strategy-tagline">Rejection off the 8, 21, or 50 EMA</div>
     <div class="strategy-body">
-      A stock in a confirmed uptrend pulls back and touches its own moving
-      average, then closes back above it on a green candle. The idea: in a
-      healthy trend, the moving average tends to act as dynamic support —
-      each pullback to it is an opportunity for buyers to step back in
-      before the trend continues, rather than a sign the trend is breaking.
+      Price is trending up, dips down, taps one of the key moving
+      averages — the 8, 21, or 50 EMA — and rejects: closes back above
+      that same line on a green candle. Any of the three counts. The idea:
+      in a healthy uptrend, these lines tend to act as dynamic support —
+      each tap is buyers stepping back in before the trend continues,
+      rather than a break in the trend.
     </div>
     <div class="strategy-section-label">What the code checks</div>
     <div class="code-note">
-      Uptrend confirmed by the last 10 days trading above their own 20-day
-      EMA average. Signal fires when a candle's low touches within
-      <b>1.5%</b> of the 20-EMA, then closes back above it on a
-      <b>green candle</b> (close &gt; open).
+      Stock is trading above its own 50 EMA (uptrend context). Signal
+      fires if the day's low touches within <b>1%</b> of the 8, 21, OR 50
+      EMA, and the candle closes back above that same EMA on a
+      <b>green candle</b>.
     </div>
     <div class="strategy-section-label">Why it can fail</div>
     <div class="strategy-body">
-      A "bounce" that immediately loses the moving average again on the
-      next candle is a common false signal — the reclaim wasn't backed by
-      real buying, just a brief wick. Volume and follow-through on the
-      next day or two matter more than the single signal candle.
+      A tap-and-reject that loses the EMA again the very next day usually
+      means the bounce wasn't backed by real buying — just a brief wick
+      back above the line. Follow-through over the next day or two matters
+      more than the single signal candle.
     </div>
     <a href="/scanner" class="stats-link">See historical win rate for this setup on any ticker →</a>
   </div>
 
   <div class="strategy-card">
     <div class="strategy-name">Breakout</div>
-    <div class="strategy-tagline">Price clears a key level on real volume</div>
+    <div class="strategy-tagline">Clearing a consolidation range and holding above it</div>
     <div class="strategy-body">
-      Price closes above its recent trading range on volume clearly above
-      normal — a sign that new buying interest is actually strong enough
-      to push through a level other traders were watching (and likely
-      have stop-losses or sell orders sitting near). Volume is what
-      separates a real breakout from a false one that just drifts back
-      into the range.
+      Price has been consolidating in a tight range — a wedge, channel, or
+      flag — then closes above both the previous day's high AND the top of
+      that whole range, holding above it rather than just poking through
+      for a moment. Volume confirms real buying interest is behind the
+      move, not just a quiet drift above the level.
     </div>
     <div class="strategy-section-label">What the code checks</div>
     <div class="code-note">
-      Signal fires when the close is above the prior <b>20-day high</b>,
-      and volume is at least <b>1.5×</b> the 20-day average volume on
-      that same day.
+      The prior <b>10 days</b>' high-low range is under <b>8%</b> of price
+      (the consolidation). Signal fires when the close is above BOTH the
+      <b>previous day's high</b> and the <b>high of that whole range</b>,
+      on volume at least <b>1.5×</b> the 20-day average.
     </div>
     <div class="strategy-section-label">Why it can fail</div>
     <div class="strategy-body">
       Breakouts without real volume behind them ("wick breakouts") often
-      reverse quickly — price pokes above the level intraday but can't
+      reverse quickly — price pokes above the range intraday but can't
       hold it by the close, or holds for a day and then fails on the next.
       A breakout on unremarkable volume is a weaker signal even if the
       price technically cleared the level.
@@ -124,28 +125,28 @@
 
   <div class="strategy-card">
     <div class="strategy-name">Undercut &amp; Rally</div>
-    <div class="strategy-tagline">A shakeout below support that fails to follow through</div>
+    <div class="strategy-tagline">A failed breakdown below the previous day's low</div>
     <div class="strategy-body">
-      Price dips briefly below a recent low — often triggering stop-losses
-      and panic selling clustered right at that level — but then reclaims
-      it and closes back above by end of day. The break below support
-      isn't automatically bearish on its own; what matters is whether
-      sellers can actually keep price down there, or whether the dip gets
-      bought back up almost immediately. A failed breakdown is often a
-      sign that control has shifted back to buyers.
+      Price dips below the previous day's low — often running the
+      stop-losses sitting right below it — but reclaims that low and
+      closes back above it by end of day. The dip below isn't
+      automatically bearish on its own; what matters is whether sellers
+      can actually keep price down there, or whether it gets bought back
+      up almost immediately. A failed breakdown is often a sign control
+      has shifted back to buyers.
     </div>
     <div class="strategy-section-label">What the code checks</div>
     <div class="code-note">
-      Signal fires when the day's low drops at least <b>1%</b> below the
-      prior <b>20-day low</b>, but the candle's close finishes back
-      <b>above</b> that prior low.
+      Signal fires when today's low drops below the <b>previous day's
+      low</b>, but the candle's close finishes back <b>above</b> that
+      previous day's low.
     </div>
     <div class="strategy-section-label">Why it can fail</div>
     <div class="strategy-body">
-      Not every dip-and-recover is meaningful — some are just noise around
-      a level with no real significance. This setup works best on a level
-      other traders are actually watching (a well-established range low),
-      not an arbitrary recent low with no real history behind it.
+      Not every dip-and-recover is meaningful — since this checks only the
+      single prior day's low, it can fire on ordinary day-to-day noise
+      around a level with no real significance, not just at levels other
+      traders are actually watching.
     </div>
     <a href="/scanner" class="stats-link">See historical win rate for this setup on any ticker →</a>
   </div>
