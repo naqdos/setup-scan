@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>glossary — nathan trades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0e; --panel: #14171a; --line: #262b2f;
+    --amber: #f5a623; --green: #3ddc84; --red: #ff5c5c;
+    --text: #d8dadc; --muted: #7a8288;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 48px 20px 80px; }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; }
+  .brand a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); margin-right: 10px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 32px; margin: 0 0 8px; }
+  .subhead { color: var(--muted); font-size: 13px; margin-bottom: 32px; }
+  .search-box {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    padding: 12px 14px;
+    margin-bottom: 32px;
+  }
+  .search-box:focus { outline: none; border-color: var(--amber); }
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--amber);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 32px 0 12px;
+  }
+  .term {
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+  }
+  .term-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .term-def { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: 4px; }
+  .term.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><a href="/">home</a><a href="/scanner">scanner</a><a href="/strategies">strategies</a><a href="/methodology">methodology</a></div>
+  <h1>Glossary</h1>
+  <div class="subhead">Plain-language definitions for terms used across the site.</div>
+
+  <input type="text" class="search-box" id="search" placeholder="Search terms..." oninput="filterTerms()">
+
+  <div id="terms">
+    <h2>Core Concepts</h2>
+    <div class="term"><div class="term-name">Relative Strength (RS)</div><div class="term-def">How a stock has performed compared to a benchmark (usually the S&amp;P 500) over the same period. Positive RS means it's outperforming the broader market.</div></div>
+    <div class="term"><div class="term-name">Relative Volume (RVOL)</div><div class="term-def">Today's trading volume divided by its own recent average volume. Above 1 means more shares are trading hands than usual — a sign of unusual interest.</div></div>
+    <div class="term"><div class="term-name">Support</div><div class="term-def">A price level where a stock has repeatedly stopped falling and bounced, because buyers tend to step in there.</div></div>
+    <div class="term"><div class="term-name">Resistance</div><div class="term-def">A price level where a stock has repeatedly stopped rising and pulled back, because sellers tend to show up there.</div></div>
+    <div class="term"><div class="term-name">Breakout</div><div class="term-def">When price moves above a resistance level (or below a support level) with enough volume to suggest the move is real, not just noise.</div></div>
+    <div class="term"><div class="term-name">Trend</div><div class="term-def">The general direction a stock's price is moving over time — up, down, or sideways.</div></div>
+    <div class="term"><div class="term-name">Higher Highs / Higher Lows</div><div class="term-def">Each peak and each pullback low is higher than the one before — the pattern that defines an uptrend.</div></div>
+    <div class="term"><div class="term-name">Lower Highs / Lower Lows</div><div class="term-def">Each peak and each bounce is lower than the one before — the pattern that defines a downtrend.</div></div>
+
+    <h2>Indicators</h2>
+    <div class="term"><div class="term-name">EMA (Exponential Moving Average)</div><div class="term-def">A moving average that weights recent prices more heavily than older ones, so it reacts faster to new price action than a simple average.</div></div>
+    <div class="term"><div class="term-name">ATR (Average True Range)</div><div class="term-def">A measure of how much a stock typically moves in a day, accounting for gaps. Higher ATR means bigger typical price swings.</div></div>
+    <div class="term"><div class="term-name">ADR% (Average Daily Range)</div><div class="term-def">The average size of a stock's daily high-to-low range, as a percentage of its price — a way to gauge how volatile a stock is day to day.</div></div>
+    <div class="term"><div class="term-name">Candlestick</div><div class="term-def">A chart element showing a stock's open, high, low, and close for a given period. The "body" shows open vs. close; the "wicks" show the high/low extremes.</div></div>
+    <div class="term"><div class="term-name">Hammer</div><div class="term-def">A candlestick with a small body and a long lower wick, often appearing after a decline — suggests buyers stepped in and pushed price back up before the close.</div></div>
+    <div class="term"><div class="term-name">Doji</div><div class="term-def">A candlestick where open and close are nearly equal, signaling indecision between buyers and sellers.</div></div>
+    <div class="term"><div class="term-name">Shooting Star</div><div class="term-def">A candlestick with a small body and a long upper wick, often appearing after a rally — suggests sellers pushed price back down before the close.</div></div>
+
+    <h2>Fundamentals</h2>
+    <div class="term"><div class="term-name">P/E Ratio</div><div class="term-def">Price-to-Earnings ratio — a stock's price divided by its earnings per share. A common (if rough) way to gauge whether a stock is expensive relative to its profits.</div></div>
+    <div class="term"><div class="term-name">PEG Ratio</div><div class="term-def">P/E ratio divided by expected earnings growth rate. Adjusts for growth, so a high P/E can still look reasonable if the company is growing fast enough.</div></div>
+    <div class="term"><div class="term-name">Market Cap</div><div class="term-def">Total value of a company's shares (share price × shares outstanding) — a way to gauge company size.</div></div>
+    <div class="term"><div class="term-name">Profit Margin</div><div class="term-def">Net income as a percentage of revenue — how much of each dollar in sales actually becomes profit.</div></div>
+
+    <h2>Trading &amp; Risk</h2>
+    <div class="term"><div class="term-name">Stop Loss</div><div class="term-def">A predetermined price at which a trader exits a losing position, to cap the loss before it grows.</div></div>
+    <div class="term"><div class="term-name">R / R-Multiple</div><div class="term-def">A way of measuring a trade's result relative to its risk. If you risked $1 to make $2, that's a "2R" winner.</div></div>
+    <div class="term"><div class="term-name">Win Rate</div><div class="term-def">The percentage of trades that were profitable, out of all trades taken for a given setup.</div></div>
+    <div class="term"><div class="term-name">Drawdown</div><div class="term-def">The decline from a peak to a trough in account value (or cumulative trade performance) — a measure of the worst stretch a strategy went through.</div></div>
+    <div class="term"><div class="term-name">52-Week High / Low</div><div class="term-def">The highest and lowest price a stock has traded at over the past year.</div></div>
+    <div class="term"><div class="term-name">Swing Trade</div><div class="term-def">A trade held over several days to weeks, aiming to capture a broader price move rather than an intraday one.</div></div>
+    <div class="term"><div class="term-name">Day Trade</div><div class="term-def">A position opened and closed within the same trading day.</div></div>
+    <div class="term"><div class="term-name">LOD / HOD</div><div class="term-def">Low of Day / High of Day — the lowest and highest price a stock has traded at so far in the current session.</div></div>
+    <div class="term"><div class="term-name">Pre-market / After-hours (AH)</div><div class="term-def">Trading that happens before the regular market opens, or after it closes.</div></div>
+    <div class="term"><div class="term-name">FOMO</div><div class="term-def">Fear Of Missing Out — the emotional urge to chase a trade because it's already moving, often leading to poor entries.</div></div>
+  </div>
+</div>
+
+<script>
+function filterTerms() {
+  const query = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.term').forEach(term => {
+    const text = term.textContent.toLowerCase();
+    term.classList.toggle('hidden', query.length > 0 && !text.includes(query));
+  });
+  document.querySelectorAll('h2').forEach(h => {
+    let sibling = h.nextElementSibling;
+    let anyVisible = false;
+    while (sibling && sibling.tagName !== 'H2') {
+      if (!sibling.classList.contains('hidden')) anyVisible = true;
+      sibling = sibling.nextElementSibling;
+    }
+    h.style.display = anyVisible ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

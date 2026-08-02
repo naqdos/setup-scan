@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>strategies — nathan trades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0e; --panel: #14171a; --line: #262b2f;
+    --amber: #f5a623; --green: #3ddc84; --red: #ff5c5c;
+    --text: #d8dadc; --muted: #7a8288;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 48px 20px 80px; }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; }
+  .brand a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); margin-right: 10px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 32px; margin: 0 0 8px; }
+  .subhead { color: var(--muted); font-size: 13px; margin-bottom: 32px; }
+
+  .strategy-card {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .strategy-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--amber);
+    margin-bottom: 4px;
+  }
+  .strategy-tagline { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+  .strategy-section-label {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 16px 0 6px;
+  }
+  .strategy-body { color: var(--text); font-size: 14px; line-height: 1.7; }
+  .code-note {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+  .code-note b { color: var(--text); }
+  .stats-link {
+    display: inline-block;
+    margin-top: 14px;
+    color: var(--amber);
+    text-decoration: none;
+    font-size: 12px;
+    border-bottom: 1px dotted var(--amber);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><a href="/">home</a><a href="/scanner">scanner</a><a href="/glossary">glossary</a><a href="/methodology">methodology</a></div>
+  <h1>Strategy Library</h1>
+  <div class="subhead">The three setups the scanner actually checks for, and the reasoning behind each.</div>
+
+  <div class="strategy-card">
+    <div class="strategy-name">MA Bounce</div>
+    <div class="strategy-tagline">Continuation off a moving average pullback</div>
+    <div class="strategy-body">
+      A stock in a confirmed uptrend pulls back and touches its own moving
+      average, then closes back above it on a green candle. The idea: in a
+      healthy trend, the moving average tends to act as dynamic support —
+      each pullback to it is an opportunity for buyers to step back in
+      before the trend continues, rather than a sign the trend is breaking.
+    </div>
+    <div class="strategy-section-label">What the code checks</div>
+    <div class="code-note">
+      Uptrend confirmed by the last 10 days trading above their own 20-day
+      EMA average. Signal fires when a candle's low touches within
+      <b>1.5%</b> of the 20-EMA, then closes back above it on a
+      <b>green candle</b> (close &gt; open).
+    </div>
+    <div class="strategy-section-label">Why it can fail</div>
+    <div class="strategy-body">
+      A "bounce" that immediately loses the moving average again on the
+      next candle is a common false signal — the reclaim wasn't backed by
+      real buying, just a brief wick. Volume and follow-through on the
+      next day or two matter more than the single signal candle.
+    </div>
+    <a href="/scanner" class="stats-link">See historical win rate for this setup on any ticker →</a>
+  </div>
+
+  <div class="strategy-card">
+    <div class="strategy-name">Breakout</div>
+    <div class="strategy-tagline">Price clears a key level on real volume</div>
+    <div class="strategy-body">
+      Price closes above its recent trading range on volume clearly above
+      normal — a sign that new buying interest is actually strong enough
+      to push through a level other traders were watching (and likely
+      have stop-losses or sell orders sitting near). Volume is what
+      separates a real breakout from a false one that just drifts back
+      into the range.
+    </div>
+    <div class="strategy-section-label">What the code checks</div>
+    <div class="code-note">
+      Signal fires when the close is above the prior <b>20-day high</b>,
+      and volume is at least <b>1.5×</b> the 20-day average volume on
+      that same day.
+    </div>
+    <div class="strategy-section-label">Why it can fail</div>
+    <div class="strategy-body">
+      Breakouts without real volume behind them ("wick breakouts") often
+      reverse quickly — price pokes above the level intraday but can't
+      hold it by the close, or holds for a day and then fails on the next.
+      A breakout on unremarkable volume is a weaker signal even if the
+      price technically cleared the level.
+    </div>
+    <a href="/scanner" class="stats-link">See historical win rate for this setup on any ticker →</a>
+  </div>
+
+  <div class="strategy-card">
+    <div class="strategy-name">Undercut &amp; Rally</div>
+    <div class="strategy-tagline">A shakeout below support that fails to follow through</div>
+    <div class="strategy-body">
+      Price dips briefly below a recent low — often triggering stop-losses
+      and panic selling clustered right at that level — but then reclaims
+      it and closes back above by end of day. The break below support
+      isn't automatically bearish on its own; what matters is whether
+      sellers can actually keep price down there, or whether the dip gets
+      bought back up almost immediately. A failed breakdown is often a
+      sign that control has shifted back to buyers.
+    </div>
+    <div class="strategy-section-label">What the code checks</div>
+    <div class="code-note">
+      Signal fires when the day's low drops at least <b>1%</b> below the
+      prior <b>20-day low</b>, but the candle's close finishes back
+      <b>above</b> that prior low.
+    </div>
+    <div class="strategy-section-label">Why it can fail</div>
+    <div class="strategy-body">
+      Not every dip-and-recover is meaningful — some are just noise around
+      a level with no real significance. This setup works best on a level
+      other traders are actually watching (a well-established range low),
+      not an arbitrary recent low with no real history behind it.
+    </div>
+    <a href="/scanner" class="stats-link">See historical win rate for this setup on any ticker →</a>
+  </div>
+
+  <div class="strategy-section-label" style="margin-top:32px;">A note on all three</div>
+  <div class="strategy-body">
+    These are pattern definitions, not predictions. The historical stats
+    on the scanner page show how each setup has actually performed on a
+    specific stock — some tickers respect these patterns much more
+    consistently than others. See
+    <a href="/methodology" style="color:var(--amber)">Methodology</a> for
+    the full disclaimer on backtested results.
+  </div>
+</div>
+</body>
+</html>

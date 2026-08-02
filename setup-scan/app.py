@@ -50,6 +50,16 @@ def methodology_page():
     return send_from_directory("static", "methodology.html")
 
 
+@app.route("/glossary")
+def glossary_page():
+    return send_from_directory("static", "glossary.html")
+
+
+@app.route("/strategies")
+def strategies_page():
+    return send_from_directory("static", "strategies.html")
+
+
 @app.route("/api/analyze")
 def api_analyze():
     ticker = request.args.get("ticker", "").strip().upper()
